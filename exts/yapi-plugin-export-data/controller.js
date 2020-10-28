@@ -29,10 +29,13 @@ class exportController extends baseController {
       list = list.sort((a, b) => {
         return a.index - b.index;
       });
+      // 无论是否为空都要导出，否则目录结构没法儿复原
       if (list.length > 0) {
         item.list = list;
-        newResult.push(item);
+      } else {
+        item.list = []
       }
+      newResult.push(item);
     }
     
     return newResult;
@@ -42,7 +45,6 @@ class exportController extends baseController {
     function delArrId(arr, fn) {
       if (!Array.isArray(arr)) return;
       arr.forEach(item => {
-        delete item._id;
         delete item.__v;
         delete item.uid;
         delete item.edit_uid;

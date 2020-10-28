@@ -235,6 +235,7 @@ class projectController extends baseController {
         up_time: yapi.commons.time()
       });
       await catInst.save({
+        parent_id: 0,
         name: '公共分类',
         project_id: result._id,
         desc: '公共分类',

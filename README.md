@@ -1,3 +1,16 @@
+# Why fork YApi ? What I did ?
+yapi 目前尚不支持接口多级分类，因此按照[社区项目](https://github.com/herenwei/yapi)的[方式](https://github.com/herenwei/yapi/commit/448a6486110858326b2756b9f85bceafcd158446#)进行了二次开发。在该项目的基础上，我调整了拖拽接口功能（分类不支持拖拽，但可以设置排序值来决定顺序），支持接口可拖拽排序或拖入到别的分类下（该项目仅支持同级目录下的接口排序）。
+
+除了以上不同点外，yapi本身的导入导出`json`数据也要配套的进行调整，否则多级目录导出的数据导入到别的项目将导致不直接包含接口的目录丢失。
+
+由于业务需要，对 [RAP1](https://github.com/thx/RAP) 导出的接口数据也做了导入支持，在插件 [rap1平台数据导入](https://github.com/wxxcarl/yapi-plugin-import-rap) 基础上按照多级目录适配做了调整，发布在 [这里](https://github.com/zeyongTsai/yapi-plugin-import-rap)。
+
+postman 也是支持多级目录的，只有这样改才能更好的适配，目前还没对 postman 的数据做适配，欢迎大家一起开发。
+
+以下是官方原文档：
+
+----
+
 ## YApi  可视化接口管理平台
 
 体验地址：

@@ -6,7 +6,7 @@ import constants from '../../../../constants/variable.js';
 import { handlePath, nameLengthLimit } from '../../../../common.js';
 import { changeEditStatus } from '../../../../reducer/modules/interface.js';
 import json5 from 'json5';
-import { message, Affix, Tabs, Modal } from 'antd';
+import { message, Affix, Tabs, Modal, TreeSelect } from 'antd';
 import EasyDragSort from '../../../../components/EasyDragSort/EasyDragSort.js';
 import mockEditor from 'client/components/AceEditor/mockEditor';
 import AceEditor from 'client/components/AceEditor/AceEditor';
@@ -803,6 +803,26 @@ class InterfaceEditForm extends Component {
 
     const DEMOPATH = '/api/user/{id}';
 
+    const temp = [...this.props.cat];
+    temp.forEach(f => {
+      f.children = temp.filter(g => g.parent_id == f._id);
+      f.children.forEach(x => {
+        x.value = x._id + '';
+        x.title = x.name;
+      });
+    });
+    const treeData = temp.filter(f => f.parent_id == 0);
+    treeData.forEach(x => {
+      x.value = x._id + '';
+      x.title = x.name;
+    });
+
+    treeData.splice(0, 0, {
+      _id: 0,
+      value: 0 + '',
+      title: '空'
+    });
+
     return (
       <div>
         <Modal
@@ -839,15 +859,8 @@ class InterfaceEditForm extends Component {
                 initialValue: this.state.catid + '',
                 rules: [{ required: true, message: '请选择一个分类' }]
               })(
-                <Select placeholder="请选择一个分类">
-                  {this.props.cat.map(item => {
-                    return (
-                      <Option key={item._id} value={item._id + ''}>
-                        {item.name}
-                      </Option>
-                    );
-                  })}
-                </Select>
+                <TreeSelect treeData={treeData}>
+                </TreeSelect>
               )}
             </FormItem>
 

@@ -23,8 +23,24 @@ async function handle(
   }, 3000)
 
   const handleAddCat = async cats => {
+    // 对 cats 中的数据按照 parent_id 调整顺序
+    // 这样上传的时候才能确保父级先创建，子级才有父级创建后的 id 可用
+    function sortByParentId (list) {
+      list.sort((a,b) => {
+        a.parent_id - b.parent_id
+      })
+    }
+    // 找到 cats 中 cat 的的父级 id
+    function findParentId (list, target) {
+      const parent = list.find(item => {
+        return item._id == target.parent_id
+      })
+      return parent ? parent.id : 0
+    }
+
     let catsObj = {};
     if (cats && Array.isArray(cats)) {
+      sortByParentId(cats);
       for (let i = 0; i < cats.length; i++) {
         let cat = cats[i];
         let findCat = _.find(menuList, menu => menu.name === cat.name);
@@ -39,8 +55,10 @@ async function handle(
 
           let data = {
             name: cat.name,
+            parent_id: findParentId(cats, cat),
             project_id: projectId,
             desc: cat.desc,
+            index: cat.index || 0,
             token
           };
           let result = await axios.post(apipath, data);

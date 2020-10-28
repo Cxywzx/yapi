@@ -11,6 +11,7 @@ class interfaceCat extends baseModel {
 
   getSchema() {
     return {
+      parent_id: {type: Number},
       name: { type: String, required: true },
       uid: { type: Number, required: true },
       project_id: { type: Number, required: true },

@@ -8,7 +8,10 @@ function importData(importDataModule) {
       res.forEach(item => {
         interfaceData.cats.push({
           name: item.name,
-          desc: item.desc
+          desc: item.desc,
+          _id: item._id,
+          index: item.index,
+          parent_id: item.parent_id
         });
         item.list.forEach(api => {
           api.catname = item.name;
