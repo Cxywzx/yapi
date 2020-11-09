@@ -104,6 +104,9 @@ class InterfaceMenu extends Component {
 
   async getList() {
     let r = await this.props.fetchInterfaceListMenu(this.props.projectId);
+    r.payload.data.data.forEach(item => {
+      item.parent_id = item.parent_id || 0
+    })
     this.setState({
       list: r.payload.data.data
     });
