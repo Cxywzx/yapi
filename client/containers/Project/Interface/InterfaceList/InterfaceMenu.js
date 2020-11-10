@@ -676,7 +676,7 @@ class InterfaceMenu extends Component {
         return a.index - b.index;//从小到大排序
       });
     });
-    const resultArray = temp.filter(f => f.parent_id == 0).sort((a, b) => {
+    const resultArray = temp.sort((a, b) => {
       return a.index - b.index;//从小到大排序
     });
 
