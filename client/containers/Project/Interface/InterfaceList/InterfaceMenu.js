@@ -104,9 +104,6 @@ class InterfaceMenu extends Component {
 
   async getList() {
     let r = await this.props.fetchInterfaceListMenu(this.props.projectId);
-    r.payload.data.data.forEach(item => {
-      item.parent_id = item.parent_id || 0
-    })
     this.setState({
       list: r.payload.data.data
     });
@@ -676,7 +673,7 @@ class InterfaceMenu extends Component {
         return a.index - b.index;//从小到大排序
       });
     });
-    const resultArray = temp.sort((a, b) => {
+    const resultArray = temp.filter(f => f.parent_id == 0).sort((a, b) => {
       return a.index - b.index;//从小到大排序
     });
 
