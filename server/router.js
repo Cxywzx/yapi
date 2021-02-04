@@ -1,6 +1,7 @@
 const koaRouter = require('koa-router');
 const interfaceController = require('./controllers/interface.js');
 const groupController = require('./controllers/group.js');
+const subGroupController = require('./controllers/subGroup.js');
 const userController = require('./controllers/user.js');
 const interfaceColController = require('./controllers/interfaceCol.js');
 const testController = require('./controllers/test.js');
@@ -26,6 +27,10 @@ let INTERFACE_CONFIG = {
   group: {
     prefix: '/group/',
     controller: groupController
+  },
+  subGroup: {
+    prefix: '/subgroup/',
+    controller: subGroupController
   },
   project: {
     prefix: '/project/',
@@ -106,6 +111,23 @@ let routerConfig = {
       action: 'get',
       path: 'get',
       method: 'get'
+    }
+  ],
+  subGroup: [
+    {
+      action: 'add',
+      path: 'add',
+      method: 'post'
+    },
+    {
+      action: 'del',
+      path: 'del',
+      method: 'post'
+    },
+    {
+      action: 'list',
+      path: 'list',
+      method: 'post'
     }
   ],
   user: [

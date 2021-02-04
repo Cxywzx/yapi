@@ -25,6 +25,7 @@ import {
 } from '../../../../reducer/modules/project';
 import { fetchGroupMsg } from '../../../../reducer/modules/group';
 import { fetchGroupList } from '../../../../reducer/modules/group.js';
+import { fetchSubGroupList } from '../../../../reducer/modules/subGroup.js'
 import { setBreadcrumb } from '../../../../reducer/modules/user';
 import { connect } from 'react-redux';
 const { TextArea } = Input;
@@ -60,6 +61,7 @@ const Option = Select.Option;
     return {
       projectList: state.project.projectList,
       groupList: state.group.groupList,
+      subGroupList: state.subGroup.subGroupList,
       projectMsg: state.project.currProject,
       currGroup: state.group.currGroup
     };
@@ -71,7 +73,8 @@ const Option = Select.Option;
     fetchGroupMsg,
     upsetProject,
     fetchGroupList,
-    setBreadcrumb
+    setBreadcrumb,
+    fetchSubGroupList
   }
 )
 @withRouter
@@ -81,6 +84,7 @@ class ProjectMessage extends Component {
     this.state = {
       protocol: 'http://',
       projectMsg: {},
+      subGroupList: [],
       showDangerOptions: false
     };
   }
@@ -94,11 +98,13 @@ class ProjectMessage extends Component {
     fetchGroupMsg: PropTypes.func,
     upsetProject: PropTypes.func,
     groupList: PropTypes.array,
+    subGroupList: PropTypes.array,
     projectList: PropTypes.array,
     projectMsg: PropTypes.object,
     fetchGroupList: PropTypes.func,
     currGroup: PropTypes.object,
-    setBreadcrumb: PropTypes.func
+    setBreadcrumb: PropTypes.func,
+    fetchSubGroupList: PropTypes.func
   };
 
   // 确认修改
@@ -119,6 +125,7 @@ class ProjectMessage extends Component {
         const selectGroup = _.find(groupList, item => {
           return item._id == group_id;
         });
+        assignValue.sub_group_id = values.subGroup || 0
 
         updateProject(assignValue)
           .then(res => {
@@ -145,6 +152,13 @@ class ProjectMessage extends Component {
         form.resetFields();
       }
     });
+  };
+
+  handleGroupSelect = async (value) => {
+    await this.props.fetchSubGroupList(value)
+    this.setState({
+      subGroupList: this.props.subGroupList
+    })
   };
 
   tagSubmit = tag => {
@@ -221,6 +235,10 @@ class ProjectMessage extends Component {
   async componentWillMount() {
     await this.props.fetchGroupList();
     await this.props.fetchGroupMsg(this.props.projectMsg.group_id);
+    await this.props.fetchSubGroupList(this.props.projectMsg.group_id)
+    this.setState({
+      subGroupList: this.props.subGroupList
+    })
   }
 
   render() {
@@ -244,12 +262,14 @@ class ProjectMessage extends Component {
       is_json5,
       tag
     } = projectMsg;
+    let sub_group_id = projectMsg.sub_group_id || ''
     initFormValues = {
       name,
       basepath,
       desc,
       project_type,
       group_id,
+      sub_group_id,
       switch_notice,
       strice,
       is_json5,
@@ -334,7 +354,7 @@ class ProjectMessage extends Component {
                   }
                 ]
               })(
-                <Select disabled={!selectDisbaled}>
+                <Select disabled={!selectDisbaled} onSelect={this.handleGroupSelect}>
                   {this.props.groupList.map((item, index) => (
                     <Option value={item._id.toString()} key={index}>
                       {item.group_name}
@@ -343,7 +363,22 @@ class ProjectMessage extends Component {
                 </Select>
               )}
             </FormItem>
-
+            <FormItem {...formItemLayout} label="所属分类">
+              {getFieldDecorator('subGroup', {
+                initialValue: initFormValues.sub_group_id + ''
+              })(
+                <Select>
+                  {this.state.subGroupList.map((item, index) => (
+                    <Option
+                      value={item._id.toString()}
+                      key={index}
+                    >
+                      {item.name}
+                    </Option>
+                  ))}
+                </Select>
+              )}
+            </FormItem>
             <FormItem
               {...formItemLayout}
               label={

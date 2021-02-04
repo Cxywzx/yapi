@@ -42,6 +42,7 @@ class projectController extends baseController {
     };
     const group_id = 'number';
     const group_name = 'string';
+    const sub_group_id = 'number';
     const project_type = {
       type: 'string',
       enum: ['private', 'public'],
@@ -62,7 +63,8 @@ class projectController extends baseController {
         desc: desc,
         color,
         icon,
-        project_type
+        project_type,
+        sub_group_id
       },
       copy: {
         '*name': name,
@@ -182,13 +184,13 @@ class projectController extends baseController {
    * @param {Number} group_id 项目分组id，不能为空
    * @param {Number} group_name 项目分组名称，不能为空
    * @param {String} project_type private public
+   * @param {Number} sub_group_id 子分组id
    * @param  {String} [desc] 项目描述
    * @returns {Object}
    * @example ./api/project/add.json
    */
   async add(ctx) {
     let params = ctx.params;
-
     if ((await this.checkAuth(params.group_id, 'group', 'edit')) !== true) {
       return (ctx.body = yapi.commons.resReturn(null, 405, '没有权限'));
     }
@@ -214,6 +216,7 @@ class projectController extends baseController {
       uid: this.getUid(),
       group_id: params.group_id,
       group_name: params.group_name,
+      sub_group_id: params.sub_group_id,
       icon: params.icon,
       color: params.color,
       add_time: yapi.commons.time(),
@@ -221,7 +224,7 @@ class projectController extends baseController {
       is_json5: false,
       env: [{ name: 'local', domain: 'http://127.0.0.1' }]
     };
-
+    
     let result = await this.Model.save(data);
     let colInst = yapi.getInst(interfaceColModel);
     let catInst = yapi.getInst(interfaceCatModel);
@@ -782,6 +785,7 @@ class projectController extends baseController {
         name: 'string',
         basepath: 'string',
         group_id: 'number',
+        sub_group_id: 'number',
         desc: 'string',
         pre_script: 'string',
         after_script: 'string',

@@ -4,6 +4,7 @@ import ProjectList from './ProjectList/ProjectList.js';
 import MemberList from './MemberList/MemberList.js';
 import GroupLog from './GroupLog/GroupLog.js';
 import GroupSetting from './GroupSetting/GroupSetting.js';
+import SubGroupSetting from './SubGroupSetting/SubGroupSetting.js'
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Route, Switch, Redirect } from 'react-router-dom';
@@ -104,6 +105,12 @@ export default class Group extends Component {
               this.props.currGroup.type !== 'private' ? (
                 <TabPane tab="分组设置" key="4">
                   <GroupSetting />
+                </TabPane>
+              ) : null}
+              {(this.props.curUserRole === 'admin' || this.props.curUserRoleInGroup === 'owner') &&
+              this.props.currGroup.type !== 'private' ? (
+                <TabPane tab="项目分类" key="5">
+                  <SubGroupSetting />
                 </TabPane>
               ) : null}
             </Tabs>

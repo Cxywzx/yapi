@@ -192,7 +192,8 @@ export function addProject(data) {
     protocol,
     icon,
     color,
-    project_type
+    project_type,
+    sub_group_id
   } = data;
 
   // 过滤项目名称中有html标签存在的情况
@@ -207,7 +208,8 @@ export function addProject(data) {
     group_name,
     icon,
     color,
-    project_type
+    project_type,
+    sub_group_id
   };
   return {
     type: PROJECT_ADD,
@@ -217,7 +219,7 @@ export function addProject(data) {
 
 // 修改项目
 export function updateProject(data) {
-  let { name, project_type, basepath, desc, _id, env, group_id, switch_notice, strice, is_json5, tag } = data;
+  let { name, project_type, basepath, desc, _id, env, group_id, sub_group_id, switch_notice, strice, is_json5, tag } = data;
   
   // 过滤项目名称中有html标签存在的情况
   name = htmlFilter(name);
@@ -230,6 +232,7 @@ export function updateProject(data) {
     id: _id,
     env,
     group_id,
+    sub_group_id,
     strice,
     is_json5,
     tag
@@ -296,6 +299,9 @@ export function delProject(id) {
 
 export async function getProject(id) {
   let result = await axios.get('/api/project/get?id=' + id);
+  result.data.data.cat.forEach(item => {
+    item.parent_id = item.parent_id || 0
+  })
   return {
     type: GET_CURR_PROJECT,
     payload: result

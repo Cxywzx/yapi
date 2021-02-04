@@ -35,6 +35,7 @@ class projectModel extends baseModel {
       desc: String,
       group_id: { type: Number, required: true },
       project_type: { type: String, required: true, enum: ['public', 'private'] },
+      sub_group_id: Number,
       members: [
         {
           uid: Number,
@@ -140,7 +141,7 @@ class projectModel extends baseModel {
   getBaseInfo(id, select) {
     select =
       select ||
-      '_id uid name basepath switch_notice desc group_id project_type env icon color add_time up_time pre_script after_script project_mock_script is_mock_open strice is_json5 tag';
+      '_id uid name basepath switch_notice desc group_id sub_group_id project_type env icon color add_time up_time pre_script after_script project_mock_script is_mock_open strice is_json5 tag';
     return this.model
       .findOne({
         _id: id
@@ -176,7 +177,7 @@ class projectModel extends baseModel {
     return this.model
       .find(params)
       .select(
-        '_id uid name basepath switch_notice desc group_id project_type color icon env add_time up_time'
+        '_id uid name basepath switch_notice desc group_id project_type sub_group_id color icon env add_time up_time'
       )
       .sort({ _id: -1 })
       .exec();

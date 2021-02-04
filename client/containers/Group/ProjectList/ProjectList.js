@@ -9,6 +9,7 @@ import {
   delProject,
   changeUpdateModal
 } from '../../../reducer/modules/project';
+import { fetchSubGroupList } from '../../../reducer/modules/subGroup.js'
 import ProjectCard from '../../../components/ProjectCard/ProjectCard.js';
 import ErrMsg from '../../../components/ErrMsg/ErrMsg.js';
 import { autobind } from 'core-decorators';
@@ -22,6 +23,7 @@ import './ProjectList.scss';
       projectList: state.project.projectList,
       userInfo: state.project.userInfo,
       tableLoading: state.project.tableLoading,
+      subGroupList: state.subGroup.subGroupList,
       currGroup: state.group.currGroup,
       currPage: state.project.currPage
     };
@@ -31,7 +33,8 @@ import './ProjectList.scss';
     addProject,
     delProject,
     changeUpdateModal,
-    setBreadcrumb
+    setBreadcrumb,
+    fetchSubGroupList
   }
 )
 class ProjectList extends Component {
@@ -45,6 +48,7 @@ class ProjectList extends Component {
   }
   static propTypes = {
     form: PropTypes.object,
+    subGroupList: PropTypes.array,
     fetchProjectList: PropTypes.func,
     addProject: PropTypes.func,
     delProject: PropTypes.func,
@@ -56,7 +60,8 @@ class ProjectList extends Component {
     setBreadcrumb: PropTypes.func,
     currPage: PropTypes.number,
     studyTip: PropTypes.number,
-    study: PropTypes.bool
+    study: PropTypes.bool,
+    fetchSubGroupList: PropTypes.func
   };
 
   // 取消修改
@@ -88,6 +93,7 @@ class ProjectList extends Component {
     // 切换分组
     if (this.props.currGroup !== nextProps.currGroup && nextProps.currGroup._id) {
       this.props.fetchProjectList(nextProps.currGroup._id, this.props.currPage);
+      this.props.fetchSubGroupList(nextProps.currGroup._id)
     }
 
     // 切换项目列表
@@ -107,11 +113,23 @@ class ProjectList extends Component {
     let projectData = this.state.projectData;
     let noFollow = [];
     let followProject = [];
+    let subGroup = this.props.subGroupList;
+    let projectDataWithGroup = [];
+    let projectDataWithGroupMap = {};
+    let noGroup = [];
     for (var i in projectData) {
       if (projectData[i].follow) {
         followProject.push(projectData[i]);
       } else {
         noFollow.push(projectData[i]);
+      }
+      if (projectData[i].sub_group_id) {
+        if (!projectDataWithGroupMap[projectData[i].sub_group_id]) {
+          projectDataWithGroupMap[projectData[i].sub_group_id] = [];
+        }
+        projectDataWithGroupMap[projectData[i].sub_group_id].push(projectData[i]);
+      } else {
+        noGroup.push(projectData[i]);
       }
     }
     followProject = followProject.sort((a, b) => {
@@ -121,6 +139,24 @@ class ProjectList extends Component {
       return b.up_time - a.up_time;
     });
     projectData = [...followProject, ...noFollow];
+
+    subGroup.forEach(item => {
+      if (projectDataWithGroupMap[item._id]) {
+        projectDataWithGroup.push({
+          subGroupName: item.name,
+          subGroupId: item._id,
+          children: [...projectDataWithGroupMap[item._id]]
+        });
+      } else {
+        noGroup = noGroup.concat(projectDataWithGroupMap[item._id] || []);
+      }
+    });
+    projectDataWithGroup.push({
+      subGroupName: '未分类',
+      subGroupId: -1,
+      children: [...noGroup]
+    });
+
 
     const isShow = /(admin)|(owner)|(dev)/.test(this.props.currGroup.role);
 
@@ -193,17 +229,26 @@ class ProjectList extends Component {
           }) : <ErrMsg type="noProject" />} */}
           {this.props.currGroup.type === 'private' ? (
             <OwnerSpace />
-          ) : projectData.length ? (
-            projectData.map((item, index) => {
+          ) : projectDataWithGroup.length ? (
+            projectDataWithGroup.map(item => {
               return (
-                <Col xs={8} lg={6} xxl={4} key={index}>
-                  <ProjectCard
-                    projectData={item}
-                    callbackResult={this.receiveRes}
-                    isShow={isShow}
-                  />
-                </Col>
-              );
+                item.children.length > 0 ? (
+                  <React.Fragment key={item.subGroupId}>
+                    <Col span={24} className="sub-group-title" >{item.subGroupName}</Col>
+                    {item.children.map((project,index) => {
+                        return (
+                          <Col xs={8} lg={6} xxl={4} key={index}>
+                            <ProjectCard
+                              projectData={project}
+                              callbackResult={this.receiveRes}
+                              isShow={isShow}
+                            />
+                          </Col>
+                        )
+                    })}
+                  </React.Fragment>
+                ) : null
+              )
             })
           ) : (
             <ErrMsg type="noProject" />

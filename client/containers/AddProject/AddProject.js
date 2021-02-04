@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Button, Form, Input, Icon, Tooltip, Select, message, Row, Col, Radio } from 'antd';
 import { addProject } from '../../reducer/modules/project.js';
 import { fetchGroupList } from '../../reducer/modules/group.js';
+import { fetchSubGroupList } from '../../reducer/modules/subGroup.js'
 import { autobind } from 'core-decorators';
 import { setBreadcrumb } from '../../reducer/modules/user';
 const { TextArea } = Input;
@@ -33,13 +34,15 @@ const formItemLayout = {
   state => {
     return {
       groupList: state.group.groupList,
+      subGroupList: state.subGroup.subGroupList,
       currGroup: state.group.currGroup
     };
   },
   {
     fetchGroupList,
     addProject,
-    setBreadcrumb
+    setBreadcrumb,
+    fetchSubGroupList
   }
 )
 @withRouter
@@ -48,17 +51,20 @@ class ProjectList extends Component {
     super(props);
     this.state = {
       groupList: [],
+      subGroupList: [],
       currGroupId: null
     };
   }
   static propTypes = {
     groupList: PropTypes.array,
+    subGroupList: PropTypes.array,
     form: PropTypes.object,
     currGroup: PropTypes.object,
     addProject: PropTypes.func,
     history: PropTypes.object,
     setBreadcrumb: PropTypes.func,
-    fetchGroupList: PropTypes.func
+    fetchGroupList: PropTypes.func,
+    fetchSubGroupList: PropTypes.func
   };
 
   handlePath = e => {
@@ -66,6 +72,12 @@ class ProjectList extends Component {
     this.props.form.setFieldsValue({
       basepath: handlePath(val)
     });
+  };
+  handleGroupSelect = async (value) => {
+    await this.props.fetchSubGroupList(value)
+    this.setState({
+      subGroupList: this.props.subGroupList
+    })
   };
 
   // 确认添加项目
@@ -78,6 +90,7 @@ class ProjectList extends Component {
         values.group_id = values.group;
         values.icon = constants.PROJECT_ICON[0];
         values.color = pickRandomProperty(constants.PROJECT_COLOR);
+        values.sub_group_id = values.subGroup || 0
         addProject(values).then(res => {
           if (res.payload.data.errcode == 0) {
             form.resetFields();
@@ -99,6 +112,13 @@ class ProjectList extends Component {
     }
     this.setState({
       currGroupId: this.props.currGroup._id ? this.props.currGroup._id : this.props.groupList[0]._id
+    }, async () => {
+      if (this.state.currGroupId) {
+        await this.props.fetchSubGroupList(this.state.currGroupId)
+        this.setState({
+          subGroupList: this.props.subGroupList
+        })
+      }
     });
     this.setState({ groupList: this.props.groupList });
   }
@@ -125,7 +145,7 @@ class ProjectList extends Component {
                   }
                 ]
               })(
-                <Select>
+                <Select onSelect={this.handleGroupSelect}>
                   {this.state.groupList.map((item, index) => (
                     <Option
                       disabled={
@@ -135,6 +155,22 @@ class ProjectList extends Component {
                       key={index}
                     >
                       {item.group_name}
+                    </Option>
+                  ))}
+                </Select>
+              )}
+            </FormItem>
+            <FormItem {...formItemLayout} label="所属分类">
+              {getFieldDecorator('subGroup', {
+                initialValue: ''
+              })(
+                <Select>
+                  {this.state.subGroupList.map((item, index) => (
+                    <Option
+                      value={item._id.toString()}
+                      key={index}
+                    >
+                      {item.name}
                     </Option>
                   ))}
                 </Select>
