@@ -17,9 +17,21 @@
   }
   &__list {
     > li {
-      line-height: 40px;
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
       border-bottom: 1px solid #d9d9d9;
       text-indent: 10px;
+      > div {
+        flex-grow: 1;
+      }
+      > i {
+        padding: 0 5px;
+        cursor: pointer;
+      }
+      > i:hover {
+        color: #2395f1;
+      }
     }
   }
 }

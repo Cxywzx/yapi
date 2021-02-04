@@ -40,6 +40,16 @@ class subGroupModel extends baseModel {
       _id: id
     });
   }
+  up(id, data) {
+    return this.model.update(
+      {
+        _id: id
+      },
+      {
+        name: data.name
+      }
+    );
+  }
 }
 
 module.exports = subGroupModel;

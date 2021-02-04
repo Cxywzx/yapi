@@ -120,6 +120,11 @@ let routerConfig = {
       method: 'post'
     },
     {
+      action: 'up',
+      path: 'edit',
+      method: 'post'
+    },
+    {
       action: 'del',
       path: 'del',
       method: 'post'

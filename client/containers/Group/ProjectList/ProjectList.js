@@ -150,7 +150,11 @@ class ProjectList extends Component {
       } else {
         noGroup = noGroup.concat(projectDataWithGroupMap[item._id] || []);
       }
+      delete projectDataWithGroupMap[item._id];
     });
+    Object.keys(projectDataWithGroupMap).forEach(k => {
+      noGroup = noGroup.concat(projectDataWithGroupMap[k] || [])
+    })
     projectDataWithGroup.push({
       subGroupName: '未分类',
       subGroupId: -1,

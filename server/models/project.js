@@ -302,6 +302,17 @@ class projectModel extends baseModel {
       })
       .limit(10);
   }
+
+  upSubGroup (old_sub_group_id, sub_group_id) {
+    return this.model.update(
+      {
+        sub_group_id: old_sub_group_id
+      },
+      {
+        $set: { 'sub_group_id': sub_group_id }
+      }
+    );
+  }
 }
 
 module.exports = projectModel;
