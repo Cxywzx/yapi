@@ -97,7 +97,7 @@ class SubGroupSetting extends Component {
     let that = this;
     let id = e.target.dataset.id * 1;
     confirm({
-      title: '确认删除该分类吗吗？',
+      title: '确认删除该分类吗？',
       content: (
         <div style={{ marginTop: '10px', fontSize: '13px', lineHeight: '25px' }}>
           <Alert
